@@ -9,11 +9,10 @@ export default Ember.Component.extend({
   didInsertElement: function(){
     var context = this.get('element').getContext('2d');
     var collection = this.get('collection');
-    var dataAttr = this.get('attribute');
+    var dataAttr = this.get('metric');
     var labelAttr = this.get('label')
-    
-    var data = this.get('collection').mapBy(dataAttr);
-    
+    var data = this.dataForChart(collection, dataAttr)
+    this.set('data', data);
     var type = Ember.String.classify(this.get('type'));
     var options = Ember.merge({}, this.get('options'));
 
@@ -35,7 +34,6 @@ export default Ember.Component.extend({
     if (this.get('legend')) {
       this.$().parent().children('[class$=legend]').remove();
     }
-
     this.get('chart').destroy();
     this.removeObserver('data', this, this.updateChart);
     this.removeObserver('data.[]', this, this.updateChart);
@@ -47,9 +45,9 @@ export default Ember.Component.extend({
     var collection = this.get('collection');
     var dataAttr = this.get('attribute');
     var labelAttr = this.get('label')
-    
+
     var data = this.get('collection').mapBy(dataAttr);
-    
+
     var redraw = ChartDataUpdater.create({
       data: data,
       chart: chart
@@ -61,11 +59,26 @@ export default Ember.Component.extend({
     } else {
       chart.update();
     }
-    
+
     if (this.get('legend')) {
       this.$().parent().children('[class$=legend]').remove();
       var legend = chart.generateLegend();
       this.$().parent().append(legend);
     }
+  },
+
+  dataForChart: function(collection, attr){
+    var arr = collection.toArray().reverse().mapBy(attr)
+    var data = {datasets: [{
+                      fillColor: 'rgba(255,255,255,.3)',
+                      strokeColor: '#fff',
+                      pointStrokeColor: '#fff',
+                      data: arr
+                    }],
+                labels: collection.toArray().reverse().map(function(item, index, enumerable){
+                  return moment(item.get('metricDate')).format("MMM Do");
+                })
+                }
+    return data
   }
 });
