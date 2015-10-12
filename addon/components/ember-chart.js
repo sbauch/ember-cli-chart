@@ -8,7 +8,12 @@ export default Ember.Component.extend({
 
   didInsertElement: function(){
     var context = this.get('element').getContext('2d');
-    var data = this.get('data');
+    var collection = this.get('collection');
+    var dataAttr = this.get('attribute');
+    var labelAttr = this.get('label')
+    
+    var data = this.get('collection').mapBy(dataAttr);
+    
     var type = Ember.String.classify(this.get('type'));
     var options = Ember.merge({}, this.get('options'));
 
@@ -39,7 +44,12 @@ export default Ember.Component.extend({
 
   updateChart: function(){
     var chart = this.get('chart');
-    var data = this.get('data');
+    var collection = this.get('collection');
+    var dataAttr = this.get('attribute');
+    var labelAttr = this.get('label')
+    
+    var data = this.get('collection').mapBy(dataAttr);
+    
     var redraw = ChartDataUpdater.create({
       data: data,
       chart: chart
